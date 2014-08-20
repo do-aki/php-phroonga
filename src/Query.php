@@ -91,6 +91,9 @@ class Query {
             $column
         ];
         $row = $this->findFirst();
+        if (!$row) {
+            return null;
+        }
         return $row->$column;
     }
 
