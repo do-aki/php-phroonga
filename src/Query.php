@@ -53,22 +53,30 @@ class Query {
             $this->query = $expr;
             return $this;
         }
-        
+
         $args = func_get_args();
         array_shift($args); // remove $expr
-        
+
         $built = substr($expr, 0, $pos);
         $offset = $pos;
         while (($pos = strpos($expr, '?', $offset)) !== false) {
             $built .= substr($expr, $offset, $pos - $offset);
             $built .= $this->escape(array_shift($args));
-            
+
             $offset = $pos + 1;
         }
         $built .= substr($expr, $offset);
         $this->query = $built;
-        
+
         return $this;
+    }
+
+    public function limit($limit) {
+        $this->limit = intval($limit);
+    }
+
+    public function offset($offset) {
+        $this->offset = intval($offset);
     }
 
     public function sortby(array $columns) {
@@ -88,7 +96,7 @@ class Query {
         $this->limit = 1;
         $r = $this->driver->select($this->getTableName(), $this->build());
         $r->setEntityClass($this->entity_class);
-        
+
         $ret = null;
         foreach ($r->getRows() as $row) {
             $ret = $row;
@@ -100,7 +108,7 @@ class Query {
     /**
      *
      * XXX: groonga の default limit 分しか取得できない
-     * 
+     *
      * @return dooaki\Phroonga\Result\SelectResult
      */
     public function findAll() {
@@ -128,7 +136,7 @@ class Query {
         $parameters = [
             'match_columns' => 'a','query' => 's','filter' => 's','scorer' => 's','sortby' => 'a','output_columns' => 'a','offset' => 's','limit' => 's','drilldown' => 'a','drilldown_sortby' => 'a','drilldown_output_columns' => 'a','drilldown_offset' => 's','drilldown_limit' => 's','cache' => 's','match_escalation_threshold' => 's','query_flags' => 's','query_expander' => 's','adjuster' => 's'
         ];
-        
+
         foreach ($parameters as $prop => $type) {
             if (isset($this->$prop)) {
                 if ($type === 'a') {
