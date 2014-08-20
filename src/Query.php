@@ -73,10 +73,12 @@ class Query {
 
     public function limit($limit) {
         $this->limit = intval($limit);
+        return $this;
     }
 
     public function offset($offset) {
         $this->offset = intval($offset);
+        return $this;
     }
 
     public function sortby(array $columns) {
