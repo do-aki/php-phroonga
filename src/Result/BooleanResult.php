@@ -16,10 +16,8 @@ class BooleanResult extends GroongaResult {
     }
 
     public static function fromArray(array $result) {
-        $r = parent::fromArray($result);
-
-        $self = new self();
-        $self->return = $r->getBody();
+        $self = parent::fromArray($result);
+        $self->return = $self->getBody();
         return $self;
     }
 }

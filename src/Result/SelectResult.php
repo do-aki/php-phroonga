@@ -42,8 +42,11 @@ class SelectResult extends GroongaResult {
     }
 
     public static function fromArray(array $result) {
-        $r = parent::fromArray($result);
-        $body = $r->getBody();
+        $self = parent::fromArray($result);
+        $body = $self->getBody();
+        if (!$self->isSuccess()) {
+            return $self;
+        }
 
         $body = array_shift($body);
 
@@ -58,7 +61,6 @@ class SelectResult extends GroongaResult {
             return $c->getName();
         }, $columns);
 
-        $self = new self();
         $self->found_count = $found_count;
         $self->columns = $columns;
         $self->rows = [];

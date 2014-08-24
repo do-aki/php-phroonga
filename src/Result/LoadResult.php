@@ -14,11 +14,8 @@ class LoadResult extends GroongaResult {
     }
 
     public static function fromArray(array $result) {
-        $r = parent::fromArray($result);
-        $body = $r->getBody();
-
-        $self = new self();
-        $self->affected_count = $body;
+        $self = parent::fromArray($result);
+        $self->affected_count = $self->getBody();
         return $self;
     }
 }

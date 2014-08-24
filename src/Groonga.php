@@ -64,7 +64,7 @@ namespace dooaki\Phroonga {
         }
 
         public function status() {
-            $this->driver->status();
+            return $this->driver->status();
         }
 
         public function tables() {

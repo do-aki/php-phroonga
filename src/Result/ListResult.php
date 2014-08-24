@@ -31,8 +31,8 @@ class ListResult extends GroongaResult {
     }
 
     public static function fromArray(array $result) {
-        $r = parent::fromArray($result);
-        $body = $r->getBody();
+        $self = parent::fromArray($result);
+        $body = $self->getBody();
 
         $column_row = array_shift($body);
         $columns = array_map(function ($c) {
@@ -43,7 +43,6 @@ class ListResult extends GroongaResult {
             return $c->getName();
         }, $columns);
 
-        $self = new self();
         $self->columns = $columns;
         $self->rows = [];
 

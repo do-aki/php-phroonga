@@ -28,7 +28,7 @@ class Http implements DriverInterface {
         $request = $this->client->get('/d/status.json');
         $response = $this->_sendRequest($request);
 
-        return HashResult::fromArray($response->getBody());
+        return HashResult::fromJson($response->getBody());
     }
 
     public function tableList() {

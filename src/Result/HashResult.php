@@ -22,10 +22,8 @@ class HashResult extends GroongaResult implements \IteratorAggregate {
     }
 
     public static function fromArray(array $result) {
-        $r = parent::fromArray($result);
-
-        $self = new self();
-        $self->properies = $r->getBody();
+        $self = parent::fromArray($result);
+        $self->properies = $self->getBody();
         return $self;
     }
 }
