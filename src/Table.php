@@ -60,4 +60,15 @@ class Table {
             $cd->createColumn($driver, $this);
         }
     }
+
+    public function removeTable(DriverInterface $driver) {
+        $driver->tableRemove($this->name);
+    }
+
+    public function removeColumns(DriverInterface $driver) {
+        foreach ($this->columns as $cd) {
+            $cd->removeColumn($driver, $this);
+        }
+    }
+
 }

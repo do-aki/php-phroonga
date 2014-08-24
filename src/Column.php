@@ -37,7 +37,7 @@ class Column {
     public function getValidator() {
         if ($this->type instanceof TableReference) {
         }
-        
+
         switch ($this->type) {
             case 'Int16':
             case 'Int32':
@@ -50,9 +50,18 @@ class Column {
 
     public function createColumn(DriverInterface $driver, Table $td) {
         if ($this->name[0] === '_') {
-            return; // skip _id, _key
+            return; // skip reserved name
         }
-        
+
         $driver->columnCreate($td->getName(), $this->getName(), $this->getFlags(), $this->getType(), $this->getSource());
     }
+
+    public function removeColumn(DriverInterface $driver, Table $td) {
+        if ($this->name[0] === '_') {
+            return; // skip reserved name
+        }
+
+        $driver->columnRemove($td->getName(), $this->getName());
+    }
+
 }

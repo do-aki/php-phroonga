@@ -6,19 +6,20 @@ use dooaki\Phroonga\GroongaResult;
 use dooaki\Phroonga\Table;
 use dooaki\Phroonga\Column;
 
-class LoadResult extends GroongaResult {
-    private $affected_count;
+class BooleanResult extends GroongaResult {
 
-    public function getAffectedCount() {
-        return $this->affected_count;
+    /**
+     * @return boolean
+     */
+    public function getResult() {
+        return $this->result;
     }
 
     public static function fromArray(array $result) {
         $r = parent::fromArray($result);
-        $body = $r->getBody();
 
         $self = new self();
-        $self->affected_count = $body;
+        $self->return = $r->getBody();
         return $self;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace dooaki\Phroonga;
 
+use dooaki\Phroonga\Exception\InvalidResponse;
+
 abstract class GroongaResult {
     const GRN_SUCCESS = 0;
     const GRN_END_OF_DATA = 1;
@@ -76,25 +78,25 @@ abstract class GroongaResult {
     const GRN_TOO_SMALL_LIMIT = -69;
     const GRN_CAS_ERROR = -70;
     const GRN_UNSUPPORTED_COMMAND_VERSION = -71;
-    
+
     /**
      *
      * @var int リターンコード
      */
     private $return_code;
-    
+
     /**
      *
      * @var float コマンド開始時刻の UNIX timestamp
      */
     private $command_started_timestamp = null;
-    
+
     /**
      *
      * @var string エラーメッセージ
      */
     private $error_message = null;
-    
+
     /**
      *
      * @var array エラー発生箇所
@@ -204,7 +206,7 @@ abstract class GroongaResult {
     public function setErrorLocation(array $error_location) {
         $this->error_location = $error_location;
     }
-    
+
     /**
      *
      * @var array Body
@@ -230,11 +232,18 @@ abstract class GroongaResult {
         $this->body = $body;
     }
 
-    abstract protected function each(callable $callback);
+    public static function fromJson($json) {
+        $ary =json_decode($json, true);
+        if ($ary === null) {
+            throw new InvalidResponse("cannot parse json");
+        }
+
+        return static::fromArray($ary);
+    }
 
     public static function fromArray(array $result) {
         list ($header, $body) = $result;
-        
+
         $r = new static();
         $r->setReturnCode($header[0]);
         $r->setCommandStartedTimestamp($header[1]);
@@ -245,7 +254,7 @@ abstract class GroongaResult {
         if (isset($header[4])) {
             $r->setErrorLocation($header[4]);
         }
-        
+
         $r->setBody($body);
         return $r;
     }

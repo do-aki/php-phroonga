@@ -18,6 +18,10 @@ namespace dooaki\Phroonga {
             $this->driver->connect($host, $port);
         }
 
+        public function getDriver() {
+            return $this->driver;
+        }
+
         public function setDriver($driver) {
             if ($driver instanceof DriverInterface) {
                 $this->driver = $driver;
@@ -59,8 +63,39 @@ namespace dooaki\Phroonga {
             $this->entities[$entitiy_name] = $cls;
         }
 
+        public function status() {
+            $this->driver->status();
+        }
+
         public function tables() {
-            return $this->driver->tableList();
+            return $this->driver->tableList()->map(function (array $row) {
+                $table = new Table($row['name'], [
+                    'flags'             => $row['flags'],
+                    'key_type'          => $row['domain'],
+                    'value_type'        => $row['range'],
+                    'default_tokenizer' => $row['default_tokenizer'],
+                    'normalizer'        => $row['normalizer'],
+                ]);
+
+                $columns = $this->driver->columnList($row['name'])->map(function (array $row) {
+                    return new Column($row['name'], $row['type'], [
+                        'flags'  => $row['flags'],
+                        'source' => $row['source'],
+                    ]);
+                })->toArray();
+
+                foreach ($columns as $c) {
+                    $table->addColumn($c);
+                }
+
+                return $table;
+            });
+        }
+
+        public function tableNames() {
+            $this->driver->tableList()->map(function(array $row) {
+                var_dump($row);die;
+            });
         }
 
         public function create() {
@@ -121,6 +156,8 @@ namespace dooaki\Phroonga\Exception {
     class TableNotfound extends \Exception {
     }
     class ColumnNotfound extends \Exception {
+    }
+    class InvalidResponse extends \Exception {
     }
     class InvalidType extends \Exception {
     }
