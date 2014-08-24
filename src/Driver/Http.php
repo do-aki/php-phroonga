@@ -97,7 +97,7 @@ class Http implements DriverInterface {
         $request = $this->client->get('/d/load.json');
         $query = $request->getQuery();
         $query->set('table', $table);
-        $query->set('values', $values);
+        $query->set('values', $data);
         $response = $this->_sendRequest($request);
 
         return LoadResult::fromJson($response->getBody());

@@ -124,7 +124,7 @@ namespace dooaki\Phroonga {
 
             $cls = get_class($entity);
 
-            var_dump($this->driver->load(SchemaMapping::getTable($cls)->getName(), $entity->toJson()));
+            return $this->driver->load(SchemaMapping::getTable($cls)->getName(), $entity->toJson());
         }
 
         /**
