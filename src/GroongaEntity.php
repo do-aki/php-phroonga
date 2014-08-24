@@ -45,7 +45,6 @@ trait GroongaEntity {
     }
 
     public function getReferenceKey() {
-        // TODO: TABLE_NO_KEY の場合は _id を返す
         $key_prop = $this->getDefinition()->hasKey() ? '_key' : '_id';
         $key = $this->__get($key_prop);
         if ($key === null) {
@@ -54,14 +53,17 @@ trait GroongaEntity {
         return $key;
     }
 
-    // XXX: load 用の json なので、メソッド名考え直した方が良いかも
-    public function toJson() {
+    public function toJsonForLoad() {
         $value_to_json = function ($value) {
             return is_object($value) ? $value->getReferenceKey() : $value;
         };
         $serialize = [];
 
         foreach ($this->row as $name => $value) {
+            if ($name === '_id') {
+                continue;
+            }
+
             if (is_array($value)) {
                 $serialize[$name] = array_map($value_to_json, $value);
             } else {
