@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "dooaki/container": "0.*"
+        "dooaki/container": "0.*",
+        "guzzle/guzzle": "3.9.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.2.*",
