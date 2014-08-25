@@ -109,6 +109,7 @@ trait GroongaEntity {
     }
 
     public static function select() {
+        // TODO: self::$grn が設定されてない場合は ativate されてない
         return self::$grn->select(__CLASS__);
     }
 

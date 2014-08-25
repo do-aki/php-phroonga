@@ -71,18 +71,43 @@ class Query {
         return $this;
     }
 
-    public function limit($limit) {
-        $this->limit = intval($limit);
-        return $this;
-    }
-
     public function offset($offset) {
         $this->offset = intval($offset);
         return $this;
     }
 
+    public function limit($limit) {
+        $this->limit = intval($limit);
+        return $this;
+    }
+
     public function sortby(array $columns) {
         $this->sortby = $columns;
+        return $this;
+    }
+
+    public function drilldown(array $columns) {
+        $ths->drilldown = $columns;
+        return $this;
+    }
+
+    public function drilldown_sortby(array $columns) {
+        $ths->drilldown_sortby = $columns;
+        return $this;
+    }
+
+    public function drilldown_output_columns(array $columns) {
+        $ths->drilldown_output_columns = $columns;
+        return $this;
+    }
+
+    public function drilldown_offset($offset) {
+        $this->drilldown_offset = intval($offset);
+        return $this;
+    }
+
+    public function drilldown_limit($limit) {
+        $this->drilldown_limit = intval($limit);
         return $this;
     }
 
@@ -139,7 +164,24 @@ class Query {
     private function build() {
         $q = [];
         $parameters = [
-            'match_columns' => 'a','query' => 's','filter' => 's','scorer' => 's','sortby' => 'a','output_columns' => 'a','offset' => 's','limit' => 's','drilldown' => 'a','drilldown_sortby' => 'a','drilldown_output_columns' => 'a','drilldown_offset' => 's','drilldown_limit' => 's','cache' => 's','match_escalation_threshold' => 's','query_flags' => 's','query_expander' => 's','adjuster' => 's'
+            'match_columns'              => 'a',
+            'query'                      => 's',
+            'filter'                     => 's',
+            'scorer'                     => 's',
+            'sortby'                     => 'a',
+            'output_columns'             => 'a',
+            'offset'                     => 's',
+            'limit'                      => 's',
+            'drilldown'                  => 'a',
+            'drilldown_sortby'           => 'a',
+            'drilldown_output_columns'   => 'a',
+            'drilldown_offset'           => 's',
+            'drilldown_limit'            => 's',
+            'cache'                      => 's',
+            'match_escalation_threshold' => 's',
+            'query_flags'                => 's',
+            'query_expander'             => 's',
+            'adjuster'                   => 's'
         ];
 
         foreach ($parameters as $prop => $type) {
