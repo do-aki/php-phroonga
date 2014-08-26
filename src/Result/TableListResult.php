@@ -13,11 +13,19 @@ class TableListResult extends GroongaResult {
     private $rows = [];
 
     public function getColumns() {
-        return $this->columns;
+        foreach ($this->columns as $column) {
+            yield new Column($column[0], $column[1], []);
+        }
     }
 
     public function getRows() {
-        return $this->rows;
+        $enum_column = new Enumerator($this->getColumns());
+        $columns = $enum_column->toArray();
+        $column_names = $enum_column->map(function (Column $c){ return $c->getName(); })->toArray();
+
+        foreach ($this->rows as $row) {
+            yield (new ResultEntity($columns))->setArray(array_combine($column_names, $row));
+        }
     }
 
     public function each(callable $callback = null) {
@@ -34,22 +42,9 @@ class TableListResult extends GroongaResult {
         $r = parent::fromArray($result);
         $body = $r->getBody();
 
-        $column_row = array_shift($body);
-        $columns = array_map(function ($c) {
-            return new Column($c[0], $c[1], []);
-        }, $column_row);
-
-        $column_names = array_map(function (Column $c) {
-            return $c->getName();
-        }, $columns);
-
         $self = new self();
-        $self->columns = $columns;
-        $self->rows = [];
-
-        foreach ($body as $row) {
-            $self->rows[] = array_combine($column_names, $row);
-        }
+        $self->columns = array_shift($body);
+        $self->rows    = $body;
 
         return $self;
     }

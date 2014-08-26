@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "dooaki/container": "0.*",
+        "dooaki/container": "dev-master",
         "guzzle/guzzle": "3.9.*"
     },
     "require-dev": {
