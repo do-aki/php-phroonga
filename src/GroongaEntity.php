@@ -16,7 +16,12 @@ trait GroongaEntity {
     }
 
     protected static function Table($name, array $options = array()) {
-        SchemaMapping::registerTable(get_called_class(), new Table($name, $options));
+        $table = new Table($name, $options);
+        $table->addColumn(new Column('_id', 'Uint32', [
+            'flags' => 'COLUMN_SCALAR'
+        ]));
+
+        SchemaMapping::registerTable(get_called_class(), $table);
     }
 
     protected static function Reference($entity_class) {

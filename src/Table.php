@@ -12,9 +12,6 @@ class Table {
     public function __construct($name, array $options) {
         $this->name = $name;
         $this->options = $options;
-        $this->addColumn(new Column('_id', 'Uint32', [
-            'flags' => 'COLUMN_SCALAR'
-        ]));
         if (isset($this->options['key_type'])) {
             $this->addColumn(new Column('_key', $this->options['key_type'], [
                 'flags' => 'COLUMN_SCALAR'
