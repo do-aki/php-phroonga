@@ -87,17 +87,17 @@ class Query {
     }
 
     public function drilldown(array $columns) {
-        $ths->drilldown = $columns;
+        $this->drilldown = $columns;
         return $this;
     }
 
     public function drilldown_sortby(array $columns) {
-        $ths->drilldown_sortby = $columns;
+        $this->drilldown_sortby = $columns;
         return $this;
     }
 
     public function drilldown_output_columns(array $columns) {
-        $ths->drilldown_output_columns = $columns;
+        $this->drilldown_output_columns = $columns;
         return $this;
     }
 
@@ -139,7 +139,7 @@ class Query {
      *
      * XXX: groonga の default limit 分しか取得できない
      *
-     * @return dooaki\Phroonga\Result\SelectResult
+     * @return \dooaki\Phroonga\Result\SelectResult
      */
     public function findAll() {
         $r = $this->driver->select($this->getTableName(), $this->build());
