@@ -1,7 +1,6 @@
 <?php
-
 namespace dooaki\Phroonga\Exception;
 
-class InvalidType extends PhroongaException {
-
+class InvalidType extends PhroongaException
+{
 }

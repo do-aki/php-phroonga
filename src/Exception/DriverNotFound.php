@@ -1,7 +1,6 @@
 <?php
-
 namespace dooaki\Phroonga\Exception;
 
-class DriverNotFound extends PhroongaException {
-
+class DriverNotFound extends PhroongaException
+{
 }

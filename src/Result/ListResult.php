@@ -1,47 +1,56 @@
 <?php
-
 namespace dooaki\Phroonga\Result;
 
 use dooaki\Phroonga\GroongaResult;
 use dooaki\Phroonga\Column;
 use dooaki\Container\Lazy\Enumerable;
 
-class ListResult extends GroongaResult {
+class ListResult extends GroongaResult
+{
     use Enumerable;
 
     private $columns = [];
+
     private $rows = [];
 
-    public function getColumns() {
+    public function getColumns()
+    {
         return $this->columns;
     }
 
-    public function getRows() {
+    public function getRows()
+    {
         return $this->rows;
     }
 
-    public function each(callable $callback = null) {
+    public function each(callable $callback = null)
+    {
         if ($callback === null) {
             return $this->getRows();
         } else {
-            foreach ($this->getRows() as $row) {
-                call_user_func($callback, $row);
-            }
+            $this->apply($callback);
         }
     }
 
-    public static function fromArray(array $result) {
+    public static function fromArray(array $result)
+    {
         $self = parent::fromArray($result);
         $body = $self->getBody();
 
         $column_row = array_shift($body);
-        $columns = array_map(function ($c) {
-            return new Column($c[0], $c[1], []);
-        }, $column_row);
+        $columns = array_map(
+            function ($c) {
+                return new Column($c[0], $c[1], []);
+            },
+            $column_row
+        );
 
-        $column_names = array_map(function (Column $c) {
-            return $c->getName();
-        }, $columns);
+        $column_names = array_map(
+            function (Column $c) {
+                return $c->getName();
+            },
+            $columns
+        );
 
         $self->columns = $columns;
         $self->rows = [];

@@ -1,15 +1,17 @@
 <?php
-
 namespace dooaki\Phroonga;
 
 use dooaki\Phroonga\Exception\DriverNotFound;
 use dooaki\Phroonga\Exception\InvalidEntity;
 
-class Groonga {
+class Groonga
+{
     private $driver;
+
     private $entities = [];
 
-    public function __construct($host, $port, $options = []) {
+    public function __construct($host, $port, $options = [])
+    {
         $options += [
             'driver' => Driver\Http::class
         ];
@@ -18,11 +20,13 @@ class Groonga {
         $this->driver->connect($host, $port);
     }
 
-    public function getDriver() {
+    public function getDriver()
+    {
         return $this->driver;
     }
 
-    public function setDriver($driver) {
+    public function setDriver($driver)
+    {
         if ($driver instanceof DriverInterface) {
             $this->driver = $driver;
         } elseif (is_string($driver)) {
@@ -38,7 +42,8 @@ class Groonga {
         }
     }
 
-    public function activate(array $classes = null) {
+    public function activate(array $classes = null)
+    {
         $entity_trait_name = GroongaEntity::class;
         if ($classes === null && trait_exists($entity_trait_name, false)) {
             $classes = [];
@@ -54,7 +59,8 @@ class Groonga {
         }
     }
 
-    protected function activateClass($cls) {
+    protected function activateClass($cls)
+    {
         $entitiy_name = $cls::_activate($this);
         if ($entitiy_name === null) {
             $entitiy_name = static::classToEntitiyName($cls);
@@ -63,50 +69,67 @@ class Groonga {
         $this->entities[$entitiy_name] = $cls;
     }
 
-    public function status() {
+    public function status()
+    {
         return $this->driver->status();
     }
 
-    public function tables() {
-        return $this->driver->tableList()->map(function (array $row) {
-            $table = new Table($row['name'], [
-                'flags'             => $row['flags'],
-                'key_type'          => $row['domain'],
-                'value_type'        => $row['range'],
-                'default_tokenizer' => $row['default_tokenizer'],
-                'normalizer'        => $row['normalizer'],
-            ]);
-
-            $columns = $this->driver->columnList($row['name'])->map(function (array $row) {
-                return new Column($row['name'], $row['type'], [
-                    'flags'  => $row['flags'],
-                    'source' => $row['source'],
+    public function tables()
+    {
+        return $this->driver->tableList()->map(
+            function (array $row) {
+                $table = new Table($row['name'], [
+                    'flags' => $row['flags'],
+                    'key_type' => $row['domain'],
+                    'value_type' => $row['range'],
+                    'default_tokenizer' => $row['default_tokenizer'],
+                    'normalizer' => $row['normalizer']
                 ]);
-            })->toArray();
 
-            foreach ($columns as $c) {
-                $table->addColumn($c);
+                $columns = $this->driver->columnList($row['name'])->map(
+                    function (array $row) {
+                        return new Column($row['name'], $row['type'], [
+                            'flags' => $row['flags'],
+                            'source' => $row['source']
+                        ]);
+                    }
+                )->toArray();
+
+                foreach ($columns as $c) {
+                    $table->addColumn($c);
+                }
+
+                return $table;
             }
-
-            return $table;
-        });
+        );
     }
 
-    public function tableNames() {
-        $this->driver->tableList()->map(function(array $row) {
-            var_dump($row);die;
-        });
+    public function tableNames()
+    {
+        $this->driver->tableList()->map(
+            function (array $row) {
+                var_dump($row);
+                die();
+            }
+        );
     }
 
-    public function create() {
-        $target = array_map(function ($cls) {
-            return SchemaMapping::getTable($cls);
-        }, $this->entities);
+    public function create()
+    {
+        $target = array_map(
+            function ($cls) {
+                return SchemaMapping::getTable($cls);
+            },
+            $this->entities
+        );
 
         $tables = array_column($this->driver->tableList()->getRows(), 'name');
-        $target = array_filter($target, function ($td) use($tables) {
-            return !in_array($td->getName(), $tables);
-        });
+        $target = array_filter(
+            $target,
+            function ($td) use($tables) {
+                return ! in_array($td->getName(), $tables);
+            }
+        );
 
         foreach ($target as $td) {
             $td->createTable($this->driver);
@@ -117,7 +140,8 @@ class Groonga {
         }
     }
 
-    public function save($entity) {
+    public function save($entity)
+    {
         if ($entity === null) {
             new InvalidEntity("cannot save entity");
         }
@@ -132,13 +156,15 @@ class Groonga {
      * @param string $entity_class
      * @return Query
      */
-    public function select($entity_class) {
+    public function select($entity_class)
+    {
         $q = new Query($this->driver);
         $q->setEntityClass($entity_class);
         return $q;
     }
 
-    public static function classToEntitiyName($cls) {
+    public static function classToEntitiyName($cls)
+    {
         $pos = strrpos($cls, '\\');
         if ($pos === false) {
             return $cls;

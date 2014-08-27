@@ -1,71 +1,80 @@
 <?php
-
 namespace dooaki\Phroonga;
 
 use dooaki\Phroonga\Exception\ColumnNotfound;
 
-class Table {
+class Table
+{
     private $name;
     private $options;
     private $columns = [];
 
-    public function __construct($name, array $options) {
+    public function __construct($name, array $options)
+    {
         $this->name = $name;
         $this->options = $options;
         if (isset($this->options['key_type'])) {
-            $this->addColumn(new Column('_key', $this->options['key_type'], [
-                'flags' => 'COLUMN_SCALAR'
-            ]));
+            $this->addColumn(
+                new Column('_key', $this->options['key_type'], ['flags' => 'COLUMN_SCALAR'])
+            );
         }
     }
 
-    public function hasKey() {
+    public function hasKey()
+    {
         return !(isset($this->options['flags']) && false !== strpos($this->options['flags'], 'TABLE_NO_KEY'));
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function addColumn(Column $cd) {
+    public function addColumn(Column $cd)
+    {
         $this->columns[$cd->getName()] = $cd;
     }
 
     /**
      *
-     * @param unknown $name
+     * @param string $name
      * @throws ColumnNotfound
      * @return Column
      */
-    public function getColumn($name) {
+    public function getColumn($name)
+    {
         if (!isset($this->columns[$name])) {
             throw new ColumnNotfound("column '{$name}' is not defined");
         }
         return $this->columns[$name];
     }
 
-    public function getColumns() {
+    public function getColumns()
+    {
         return array_values($this->columns);
     }
 
-    public function createTable(DriverInterface $driver) {
+    public function createTable(DriverInterface $driver)
+    {
         $driver->tableCreate($this->name, $this->options);
     }
 
-    public function createColumns(DriverInterface $driver) {
+    public function createColumns(DriverInterface $driver)
+    {
         foreach ($this->columns as $cd) {
             $cd->createColumn($driver, $this);
         }
     }
 
-    public function removeTable(DriverInterface $driver) {
+    public function removeTable(DriverInterface $driver)
+    {
         $driver->tableRemove($this->name);
     }
 
-    public function removeColumns(DriverInterface $driver) {
+    public function removeColumns(DriverInterface $driver)
+    {
         foreach ($this->columns as $cd) {
             $cd->removeColumn($driver, $this);
         }
     }
-
 }

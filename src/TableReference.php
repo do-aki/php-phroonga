@@ -1,15 +1,18 @@
 <?php
-
 namespace dooaki\Phroonga;
 
-class TableReference {
+class TableReference
+{
+
     private $class_name;
 
-    public function __construct($entity_class) {
+    public function __construct($entity_class)
+    {
         $this->class_name = $entity_class;
     }
 
-    public function asType() {
+    public function asType()
+    {
         return SchemaMapping::getTable($this->class_name)->getName();
     }
 }

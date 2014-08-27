@@ -1,10 +1,10 @@
 <?php
-
 namespace dooaki\Phroonga;
 
 use dooaki\Phroonga\DriverInterface;
 
-class Query {
+class Query
+{
     private $driver;
     private $entity_class;
     private $match_columns;
@@ -26,28 +26,34 @@ class Query {
     private $query_expander;
     private $adjuster;
 
-    public function __construct(DriverInterface $driver) {
+    public function __construct(DriverInterface $driver)
+    {
         $this->driver = $driver;
     }
 
-    public function setEntityClass($entity_class) {
+    public function setEntityClass($entity_class)
+    {
         $this->entity_class = $entity_class;
     }
 
-    public function getTableName() {
+    public function getTableName()
+    {
         return SchemaMapping::getTable($this->entity_class)->getName();
     }
 
-    public function filter() {
+    public function filter()
+    {
         return $this;
     }
 
-    public function match(array $columns, $word) {
+    public function match(array $columns, $word)
+    {
         $this->match_columns = $columns;
         $this->query = $this->escape($word);
     }
 
-    public function query($expr) {
+    public function query($expr)
+    {
         $pos = strpos($expr, '?');
         if ($pos === false) {
             $this->query = $expr;
@@ -71,58 +77,68 @@ class Query {
         return $this;
     }
 
-    public function offset($offset) {
+    public function offset($offset)
+    {
         $this->offset = intval($offset);
         return $this;
     }
 
-    public function limit($limit) {
+    public function limit($limit)
+    {
         $this->limit = intval($limit);
         return $this;
     }
 
-    public function sortby(array $columns) {
+    public function sortby(array $columns)
+    {
         $this->sortby = $columns;
         return $this;
     }
 
-    public function drilldown(array $columns) {
+    public function drilldown(array $columns)
+    {
         $this->drilldown = $columns;
         return $this;
     }
 
-    public function drilldown_sortby(array $columns) {
+    public function drilldown_sortby(array $columns)
+    {
         $this->drilldown_sortby = $columns;
         return $this;
     }
 
-    public function drilldown_output_columns(array $columns) {
+    public function drilldown_output_columns(array $columns)
+    {
         $this->drilldown_output_columns = $columns;
         return $this;
     }
 
-    public function drilldown_offset($offset) {
+    public function drilldown_offset($offset)
+    {
         $this->drilldown_offset = intval($offset);
         return $this;
     }
 
-    public function drilldown_limit($limit) {
+    public function drilldown_limit($limit)
+    {
         $this->drilldown_limit = intval($limit);
         return $this;
     }
 
-    public function findOne($column) {
+    public function findOne($column)
+    {
         $this->output_columns = [
             $column
         ];
         $row = $this->findFirst();
-        if (!$row) {
+        if (! $row) {
             return null;
         }
         return $row->$column;
     }
 
-    public function findFirst() {
+    public function findFirst()
+    {
         $this->limit = 1;
         $r = $this->driver->select($this->getTableName(), $this->build());
         $r->setEntityClass($this->entity_class);
@@ -141,27 +157,31 @@ class Query {
      *
      * @return \dooaki\Phroonga\Result\SelectResult
      */
-    public function findAll() {
+    public function findAll()
+    {
         $r = $this->driver->select($this->getTableName(), $this->build());
         $r->setEntityClass($this->entity_class);
         return $r;
     }
 
-    public function pagerize() {
+    public function pagerize()
+    {
         $r = $this->driver->select($this->getTableName(), $this->build());
         $r->setEntityClass($this->entity_class);
         return $r;
     }
 
-    public function escape($str) {
-        return str_replace([
-            ' ','"',"'",'(',')','\\'
-        ], [
-            '\\ ','\\"',"\\'",'\\(','\\)','\\\\'
-        ], $str);
+    public function escape($str)
+    {
+        return str_replace(
+            [' '  , '"'  , "'"  , '('  , ')'  , '\\'  ],
+            ['\\ ', '\\"', "\\'", '\\(', '\\)', '\\\\'],
+            $str
+        );
     }
 
-    private function build() {
+    private function build()
+    {
         $q = [];
         $parameters = [
             'match_columns'              => 'a',
@@ -196,12 +216,12 @@ class Query {
         return $q;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         $ret = "select {$this->getTableName()}";
         foreach ($this->build() as $n => $v) {
             $ret .= " --{$n} {$v}";
         }
-        ;
         return $ret;
     }
 }

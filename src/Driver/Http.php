@@ -1,5 +1,4 @@
 <?php
-
 namespace dooaki\Phroonga\Driver;
 
 use Guzzle\Http\Client;
@@ -13,32 +12,36 @@ use dooaki\Phroonga\Result\LoadResult;
 use dooaki\Phroonga\Result\BooleanResult;
 use dooaki\Phroonga\Result\HashResult;
 
-class Http implements DriverInterface {
-
+class Http implements DriverInterface
+{
     /**
      * @var Guzzle\Http\Client
      */
     private $client;
 
-    public function connect($host, $port) {
+    public function connect($host, $port)
+    {
         $this->client = new Client("http://{$host}:{$port}");
     }
 
-    public function status() {
+    public function status()
+    {
         $request = $this->client->get('/d/status.json');
         $response = $this->_sendRequest($request);
 
         return HashResult::fromJson($response->getBody());
     }
 
-    public function tableList() {
+    public function tableList()
+    {
         $request = $this->client->get('/d/table_list.json');
         $response = $this->_sendRequest($request);
 
         return ListResult::fromJson($response->getBody());
     }
 
-    public function tableCreate($name, array $options) {
+    public function tableCreate($name, array $options)
+    {
         $request = $this->client->get('/d/table_create.json');
         $query = $request->getQuery();
         $query->set('name', $name);
@@ -50,7 +53,8 @@ class Http implements DriverInterface {
         return BooleanResult::fromJson($response->getBody());
     }
 
-    public function tableRemove($name) {
+    public function tableRemove($name)
+    {
         $request = $this->client->get('/d/table_remove.json');
         $query = $request->getQuery();
         $query->set('name', $name);
@@ -59,7 +63,8 @@ class Http implements DriverInterface {
         return BooleanResult::fromJson($response->getBody());
     }
 
-    public function columnList($table) {
+    public function columnList($table)
+    {
         $request = $this->client->get('/d/column_list.json');
         $query = $request->getQuery();
         $query->set('table', $table);
@@ -68,7 +73,8 @@ class Http implements DriverInterface {
         return ListResult::fromJson($response->getBody());
     }
 
-    public function columnCreate($table, $name, $flags, $type, $source = null) {
+    public function columnCreate($table, $name, $flags, $type, $source = null)
+    {
         $request = $this->client->get('/d/column_create.json');
         $query = $request->getQuery();
         $query->set('table', $table);
@@ -83,7 +89,8 @@ class Http implements DriverInterface {
         return BooleanResult::fromJson($response->getBody());
     }
 
-    public function columnRemove($table, $name) {
+    public function columnRemove($table, $name)
+    {
         $request = $this->client->get('/d/column_remove.json');
         $query = $request->getQuery();
         $query->set('table', $table);
@@ -93,7 +100,8 @@ class Http implements DriverInterface {
         return BooleanResult::fromJson($response->getBody());
     }
 
-    public function load($table, $data) {
+    public function load($table, $data)
+    {
         $request = $this->client->get('/d/load.json');
         $query = $request->getQuery();
         $query->set('table', $table);
@@ -103,7 +111,8 @@ class Http implements DriverInterface {
         return LoadResult::fromJson($response->getBody());
     }
 
-    public function select($table, array $params) {
+    public function select($table, array $params)
+    {
         $request = $this->client->get('/d/select.json');
         $query = $request->getQuery();
         $query->set('table', $table);
@@ -115,7 +124,8 @@ class Http implements DriverInterface {
         return SelectResult::fromJson($response->getBody());
     }
 
-    private function _sendRequest(RequestInterface $request) {
+    private function _sendRequest(RequestInterface $request)
+    {
         try {
             return $request->send();
         } catch (ClientErrorResponseException $e) {

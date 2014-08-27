@@ -1,7 +1,6 @@
 <?php
-
 namespace dooaki\Phroonga\Exception;
 
-class TableNotFound extends PhroongaException {
-
+class TableNotFound extends PhroongaException
+{
 }

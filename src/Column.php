@@ -1,40 +1,50 @@
 <?php
-
 namespace dooaki\Phroonga;
 
-class Column {
+class Column
+{
     private $name;
+
     private $flags;
+
     private $type;
+
     private $source;
 
-    public function __construct($name, $type, array $options) {
+    public function __construct($name, $type, array $options)
+    {
         $this->name = $name;
         $this->type = $type;
         $options += [
-            'flags' => 'COLUMN_SCALAR','source' => null
+            'flags' => 'COLUMN_SCALAR',
+            'source' => null
         ];
         $this->flags = $options['flags'];
         $this->source = $options['source'];
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function getType() {
+    public function getType()
+    {
         return ($this->type instanceof TableReference) ? $this->type->asType() : $this->type;
     }
 
-    public function getFlags() {
+    public function getFlags()
+    {
         return $this->flags;
     }
 
-    public function getSource() {
+    public function getSource()
+    {
         return $this->source;
     }
 
-    public function getValidator() {
+    public function getValidator()
+    {
         if ($this->type instanceof TableReference) {
         }
 
@@ -45,10 +55,12 @@ class Column {
         }
     }
 
-    public function getAdapter() {
+    public function getAdapter()
+    {
     }
 
-    public function createColumn(DriverInterface $driver, Table $td) {
+    public function createColumn(DriverInterface $driver, Table $td)
+    {
         if ($this->name[0] === '_') {
             return; // skip reserved name
         }
@@ -56,12 +68,12 @@ class Column {
         $driver->columnCreate($td->getName(), $this->getName(), $this->getFlags(), $this->getType(), $this->getSource());
     }
 
-    public function removeColumn(DriverInterface $driver, Table $td) {
+    public function removeColumn(DriverInterface $driver, Table $td)
+    {
         if ($this->name[0] === '_') {
             return; // skip reserved name
         }
 
         $driver->columnRemove($td->getName(), $this->getName());
     }
-
 }

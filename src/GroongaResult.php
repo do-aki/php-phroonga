@@ -1,10 +1,10 @@
 <?php
-
 namespace dooaki\Phroonga;
 
 use dooaki\Phroonga\Exception\InvalidResponse;
 
-abstract class GroongaResult {
+abstract class GroongaResult
+{
     const GRN_SUCCESS = 0;
     const GRN_END_OF_DATA = 1;
     const GRN_UNKNOWN_ERROR = -1;
@@ -80,25 +80,21 @@ abstract class GroongaResult {
     const GRN_UNSUPPORTED_COMMAND_VERSION = -71;
 
     /**
-     *
      * @var int リターンコード
      */
     private $return_code;
 
     /**
-     *
      * @var float コマンド開始時刻の UNIX timestamp
      */
     private $command_started_timestamp = null;
 
     /**
-     *
      * @var string エラーメッセージ
      */
     private $error_message = null;
 
     /**
-     *
      * @var array エラー発生箇所
      */
     private $error_location = null;
@@ -108,7 +104,8 @@ abstract class GroongaResult {
      *
      * @return boolean 成功時 true, 失敗時 false
      */
-    public function isSuccess() {
+    public function isSuccess()
+    {
         return $this->return_code === self::GRN_SUCCESS;
     }
 
@@ -117,17 +114,18 @@ abstract class GroongaResult {
      *
      * @return int リターンコード
      */
-    public function getReturnCode() {
+    public function getReturnCode()
+    {
         return $this->return_code;
     }
 
     /**
      * リターンコード の設定
      *
-     * @param int $return_code
-     *            リターンコード
+     * @param int $return_code リターンコード
      */
-    public function setReturnCode($return_code) {
+    public function setReturnCode($return_code)
+    {
         $this->return_code = intval($return_code);
     }
 
@@ -136,17 +134,18 @@ abstract class GroongaResult {
      *
      * @return float コマンド開始時刻の UNIX timestamp
      */
-    public function getCommandStartedTimestamp() {
+    public function getCommandStartedTimestamp()
+    {
         return $this->command_started_timestamp;
     }
 
     /**
      * コマンド開始時刻の設定
      *
-     * @param float $command_started_timestamp
-     *            コマンド開始時刻の UNIX timestamp
+     * @param float $command_started_timestamp コマンド開始時刻の UNIX timestamp
      */
-    public function setCommandStartedTimestamp($command_started_timestamp) {
+    public function setCommandStartedTimestamp($command_started_timestamp)
+    {
         $this->command_started_timestamp = floatval($command_started_timestamp);
     }
 
@@ -155,17 +154,18 @@ abstract class GroongaResult {
      *
      * @return float コマンド実行時間
      */
-    public function getElapsedSec() {
+    public function getElapsedSec()
+    {
         return $this->elapsed_sec;
     }
 
     /**
      * コマンド実行時間 の設定
      *
-     * @param float $elapsed_sec
-     *            コマンド実行時間
+     * @param float $elapsed_sec コマンド実行時間
      */
-    public function setElapsedSec($elapsed_sec) {
+    public function setElapsedSec($elapsed_sec)
+    {
         $this->elapsed_sec = floatval($elapsed_sec);
     }
 
@@ -174,17 +174,18 @@ abstract class GroongaResult {
      *
      * @return string エラーメッセージ
      */
-    public function getErrorMessage() {
+    public function getErrorMessage()
+    {
         return $this->error_message;
     }
 
     /**
      * エラーメッセージ の設定
      *
-     * @param string $error_message
-     *            エラーメッセージ
+     * @param string $error_message エラーメッセージ
      */
-    public function setErrorMessage($error_message) {
+    public function setErrorMessage($error_message)
+    {
         $this->error_message = $error_message;
     }
 
@@ -193,17 +194,18 @@ abstract class GroongaResult {
      *
      * @return array error_location
      */
-    public function getErrorLocation() {
+    public function getErrorLocation()
+    {
         return $this->error_location;
     }
 
     /**
      * エラー発生箇所 の設定
      *
-     * @param array $error_location
-     *            error_location
+     * @param array $error_location error_location
      */
-    public function setErrorLocation(array $error_location) {
+    public function setErrorLocation(array $error_location)
+    {
         $this->error_location = $error_location;
     }
 
@@ -218,7 +220,8 @@ abstract class GroongaResult {
      *
      * @return array Body
      */
-    public function getBody() {
+    public function getBody()
+    {
         return $this->body;
     }
 
@@ -228,12 +231,14 @@ abstract class GroongaResult {
      * @param array $body
      *            body
      */
-    public function setBody($body) {
+    public function setBody($body)
+    {
         $this->body = $body;
     }
 
-    public static function fromJson($json) {
-        $ary =json_decode($json, true);
+    public static function fromJson($json)
+    {
+        $ary = json_decode($json, true);
         if ($ary === null) {
             throw new InvalidResponse("cannot parse json");
         }
@@ -241,7 +246,8 @@ abstract class GroongaResult {
         return static::fromArray($ary);
     }
 
-    public static function fromArray(array $result) {
+    public static function fromArray(array $result)
+    {
         list ($header, $body) = $result;
 
         $r = new static();
@@ -259,4 +265,3 @@ abstract class GroongaResult {
         return $r;
     }
 }
-
