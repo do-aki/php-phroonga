@@ -2,8 +2,10 @@
 namespace dooaki\Phroonga\Result;
 
 use dooaki\Phroonga\GroongaResult;
+use dooaki\Phroonga\ResultEntity;
 use dooaki\Phroonga\Column;
 use dooaki\Container\Lazy\Enumerable;
+use dooaki\Container\Lazy\Enumerator;
 
 class ListResult extends GroongaResult
 {
@@ -15,12 +17,28 @@ class ListResult extends GroongaResult
 
     public function getColumns()
     {
-        return $this->columns;
+        foreach ($this->columns as $column) {
+            yield new Column($column[0], $column[1], []);
+        }
     }
 
     public function getRows()
     {
-        return $this->rows;
+        $columns = $this->getColumnEnumerator()->toArray();
+        $column_names = $this->getColumnEnumerator()->map(
+            function (Column $c) {
+                return $c->getName();
+            }
+        )->toArray();
+
+        foreach ($this->rows as $row) {
+            yield (new ResultEntity($columns))->setArray(array_combine($column_names, $row));
+        }
+    }
+
+    public function getColumnEnumerator()
+    {
+        return new Enumerator([$this, 'getColumns']);
     }
 
     public function each(callable $callback = null)
@@ -32,32 +50,18 @@ class ListResult extends GroongaResult
         }
     }
 
+    /**
+     *
+     * @param array $result
+     * @return \dooaki\Phroonga\Result\ListResult
+     */
     public static function fromArray(array $result)
     {
         $self = parent::fromArray($result);
         $body = $self->getBody();
 
-        $column_row = array_shift($body);
-        $columns = array_map(
-            function ($c) {
-                return new Column($c[0], $c[1], []);
-            },
-            $column_row
-        );
-
-        $column_names = array_map(
-            function (Column $c) {
-                return $c->getName();
-            },
-            $columns
-        );
-
-        $self->columns = $columns;
-        $self->rows = [];
-
-        foreach ($body as $row) {
-            $self->rows[] = array_combine($column_names, $row);
-        }
+        $self->columns = array_shift($body);
+        $self->rows = $body;
 
         return $self;
     }

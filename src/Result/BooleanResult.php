@@ -15,10 +15,15 @@ class BooleanResult extends GroongaResult
         return $this->result;
     }
 
+    /**
+     *
+     * @param array $result
+     * @return \dooaki\Phroonga\BooleanResult
+     */
     public static function fromArray(array $result)
     {
         $self = parent::fromArray($result);
-        $self->return = $self->getBody();
+        $self->result = $self->getBody();
         return $self;
     }
 }

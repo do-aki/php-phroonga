@@ -77,27 +77,34 @@ class Groonga
     public function tables()
     {
         return $this->driver->tableList()->map(
-            function (array $row) {
-                $table = new Table($row['name'], [
-                    'flags' => $row['flags'],
-                    'key_type' => $row['domain'],
-                    'value_type' => $row['range'],
-                    'default_tokenizer' => $row['default_tokenizer'],
-                    'normalizer' => $row['normalizer']
-                ]);
+            function (ResultEntity $row) {
+                $table = new Table(
+                    $row->name,
+                    [
+                        'flags' => $row->flags,
+                        'key_type' => $row->domain,
+                        'value_type' => $row->range,
+                        'default_tokenizer' => $row->default_tokenizer,
+                        'normalizer' => $row->normalizer
+                    ]
+                );
 
-                $columns = $this->driver->columnList($row['name'])->map(
-                    function (array $row) {
-                        return new Column($row['name'], $row['type'], [
-                            'flags' => $row['flags'],
-                            'source' => $row['source']
-                        ]);
+                $this->driver->columnList($row->name)->map(
+                    function (ResultEntity $row) {
+                        return new Column(
+                            $row->name,
+                            $row->type,
+                            [
+                                'flags' => $row->flags,
+                                'source' => $row->source,
+                            ]
+                        );
                     }
-                )->toArray();
-
-                foreach ($columns as $c) {
-                    $table->addColumn($c);
-                }
+                )->apply(
+                    function (Column $c) use ($table) {
+                        $table->addColumn($c);
+                    }
+                );
 
                 return $table;
             }
@@ -106,12 +113,11 @@ class Groonga
 
     public function tableNames()
     {
-        $this->driver->tableList()->map(
-            function (array $row) {
-                var_dump($row);
-                die();
+        return $this->driver->tableList()->map(
+            function (ResultEntity $r) {
+                return $r;
             }
-        );
+        )->toArray();
     }
 
     public function create()
@@ -123,7 +129,7 @@ class Groonga
             $this->entities
         );
 
-        $tables = array_column($this->driver->tableList()->getRows(), 'name');
+        $tables = $this->tableNames();
         $target = array_filter(
             $target,
             function ($td) use($tables) {

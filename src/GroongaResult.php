@@ -236,6 +236,13 @@ abstract class GroongaResult
         $this->body = $body;
     }
 
+    /**
+     * Build GroongaResult object from JSON
+     *
+     * @param string $json
+     * @throws \dooaki\Phroonga\InvalidResponse
+     * @return \dooaki\Phroonga\GroongaResult
+     */
     public static function fromJson($json)
     {
         $ary = json_decode($json, true);
@@ -246,6 +253,12 @@ abstract class GroongaResult
         return static::fromArray($ary);
     }
 
+    /**
+     * Build GroongaResult object from Array
+     *
+     * @param array $result
+     * @return \dooaki\Phroonga\GroongaResult
+     */
     public static function fromArray(array $result)
     {
         list ($header, $body) = $result;

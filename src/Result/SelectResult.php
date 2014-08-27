@@ -50,10 +50,15 @@ class SelectResult extends GroongaResult
         }
     }
 
+    public function getColumnEnumerator()
+    {
+        return new Enumerator([$this, 'getColumns']);
+    }
+
     public function getRows()
     {
         $cls = $this->entity_class;
-        $column_names = (new Enumerator($this->getColumns()))->map(
+        $column_names = $this->getColumnEnumerator()->map(
             function (Column $c) {
                 return $c->getName();
             }
@@ -76,16 +81,19 @@ class SelectResult extends GroongaResult
         }
     }
 
+    public function getDrilldownColumnEnumerator()
+    {
+        return new Enumerator([$this, 'getDrilldownColumns']);
+    }
+
     public function getDrilldownRows()
     {
-        list ($columns, $column_names) = (new Enumerator($this->getDrilldownColumns()))->map(
+        $columns = $this->getDrilldownColumnEnumerator()->toArray();
+        $column_names = $this->getDrilldownColumnEnumerator()->map(
             function (Column $c) {
-                return [
-                    $c,
-                    $c->getName()
-                ];
+                return $c->getName();
             }
-        )->transpose()->toArray();
+        )->toArray();
 
         foreach ($this->drilldown_rows as $row) {
             $result = new ResultEntity($columns);
