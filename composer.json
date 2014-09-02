@@ -11,12 +11,12 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "dooaki/container": "dev-master",
+        "dooaki/container": "@dev",
         "guzzle/guzzle": "3.9.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.2.*",
-        "satooshi/php-coveralls": "dev-master"
+        "satooshi/php-coveralls": "@dev"
     },
     "autoload": {
         "psr-4": { "dooaki\\Phroonga\\" : "src/" }
