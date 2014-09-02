@@ -29,7 +29,7 @@ class Http implements DriverInterface
         $request = $this->client->get('/d/status.json');
         $response = $this->_sendRequest($request);
 
-        return HashResult::fromJson($response->getBody());
+        return HashResult::fromJson((string)$response->getBody());
     }
 
     public function tableList()
@@ -37,7 +37,7 @@ class Http implements DriverInterface
         $request = $this->client->get('/d/table_list.json');
         $response = $this->_sendRequest($request);
 
-        return ListResult::fromJson($response->getBody());
+        return ListResult::fromJson((string)$response->getBody());
     }
 
     public function tableCreate($name, array $options)
@@ -50,7 +50,7 @@ class Http implements DriverInterface
         }
         $response = $this->_sendRequest($request);
 
-        return BooleanResult::fromJson($response->getBody());
+        return BooleanResult::fromJson((string)$response->getBody());
     }
 
     public function tableRemove($name)
@@ -60,7 +60,7 @@ class Http implements DriverInterface
         $query->set('name', $name);
         $response = $this->_sendRequest($request);
 
-        return BooleanResult::fromJson($response->getBody());
+        return BooleanResult::fromJson((string)$response->getBody());
     }
 
     public function columnList($table)
@@ -70,7 +70,7 @@ class Http implements DriverInterface
         $query->set('table', $table);
         $response = $this->_sendRequest($request);
 
-        return ListResult::fromJson($response->getBody());
+        return ListResult::fromJson((string)$response->getBody());
     }
 
     public function columnCreate($table, $name, $flags, $type, $source = null)
@@ -86,7 +86,7 @@ class Http implements DriverInterface
         }
         $response = $this->_sendRequest($request);
 
-        return BooleanResult::fromJson($response->getBody());
+        return BooleanResult::fromJson((string)$response->getBody());
     }
 
     public function columnRemove($table, $name)
@@ -97,7 +97,7 @@ class Http implements DriverInterface
         $query->set('name', $name);
         $response = $this->_sendRequest($request);
 
-        return BooleanResult::fromJson($response->getBody());
+        return BooleanResult::fromJson((string)$response->getBody());
     }
 
     public function load($table, $data)
@@ -108,7 +108,7 @@ class Http implements DriverInterface
         $query->set('values', $data);
         $response = $this->_sendRequest($request);
 
-        return LoadResult::fromJson($response->getBody());
+        return LoadResult::fromJson((string)$response->getBody());
     }
 
     public function select($table, array $params)
@@ -121,7 +121,7 @@ class Http implements DriverInterface
         }
         $response = $this->_sendRequest($request);
 
-        return SelectResult::fromJson($response->getBody());
+        return SelectResult::fromJson((string)$response->getBody());
     }
 
     private function _sendRequest(RequestInterface $request)
