@@ -1,6 +1,8 @@
 <?php
 namespace dooaki\Phroonga;
 
+use dooaki\Phroonga\Exception\CommandFailure;
+
 class Column
 {
     private $name;
@@ -31,6 +33,11 @@ class Column
     public function getType()
     {
         return ($this->type instanceof TableReference) ? $this->type->asType() : $this->type;
+    }
+
+    public function typeIsReference()
+    {
+        return $this->type instanceof TableReference;
     }
 
     public function getFlags()
@@ -65,7 +72,12 @@ class Column
             return; // skip reserved name
         }
 
-        $driver->columnCreate($td->getName(), $this->getName(), $this->getFlags(), $this->getType(), $this->getSource());
+        $result = $driver->columnCreate($td->getName(), $this->getName(), $this->getFlags(), $this->getType(), $this->getSource());
+        if ($result->isFailure()) {
+            $e = new CommandFailure($result->getErrorMessage());
+            $e->setResult($result);
+            throw $e;
+        }
     }
 
     public function removeColumn(DriverInterface $driver, Table $td)
@@ -74,6 +86,11 @@ class Column
             return; // skip reserved name
         }
 
-        $driver->columnRemove($td->getName(), $this->getName());
+        $result = $driver->columnRemove($td->getName(), $this->getName());
+        if ($result->isFailure()) {
+            $e = new CommandFailure($result->getErrorMessage());
+            $e->setResult($result);
+            throw $e;
+        }
     }
 }

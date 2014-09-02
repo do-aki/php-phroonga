@@ -2,6 +2,7 @@
 namespace dooaki\Phroonga;
 
 use dooaki\Phroonga\Exception\InvalidResponse;
+use dooaki\Phroonga\Exception\InvalidArgument;
 
 abstract class GroongaResult
 {
@@ -107,6 +108,16 @@ abstract class GroongaResult
     public function isSuccess()
     {
         return $this->return_code === self::GRN_SUCCESS;
+    }
+
+    /**
+     * コマンドが失敗したかどうか
+     *
+     * @return boolean 失敗時 true, 成功時 false
+     */
+    public function isFailure()
+    {
+        return !$this->isSuccess();
     }
 
     /**
@@ -245,9 +256,13 @@ abstract class GroongaResult
      */
     public static function fromJson($json)
     {
-        $ary = json_decode($json, true);
+        mb_convert_variables('UTF-8', 'UTF-8', $json); // replace invalid char as utf8
+
+        $ary = json_decode($json, true, 512, JSON_BIGINT_AS_STRING);
         if ($ary === null) {
-            throw new InvalidResponse("cannot parse json");
+            $e = new InvalidArgument("cannot parse json: " . json_last_error_msg(), json_last_error());
+            $e->setArguments(func_get_args());
+            throw $e;
         }
 
         return static::fromArray($ary);

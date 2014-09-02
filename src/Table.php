@@ -2,6 +2,7 @@
 namespace dooaki\Phroonga;
 
 use dooaki\Phroonga\Exception\ColumnNotfound;
+use dooaki\Phroonga\Exception\CommandFailure;
 
 class Table
 {
@@ -25,6 +26,11 @@ class Table
         return !(isset($this->options['flags']) && false !== strpos($this->options['flags'], 'TABLE_NO_KEY'));
     }
 
+    public function getKeyName()
+    {
+        return $this->hasKey() ? '_key' : '_id';
+    }
+
     public function getName()
     {
         return $this->name;
@@ -39,14 +45,24 @@ class Table
      *
      * @param string $name
      * @throws ColumnNotfound
-     * @return Column
+     * @return \dooaki\Phroonga\Column
      */
     public function getColumn($name)
     {
-        if (!isset($this->columns[$name])) {
-            throw new ColumnNotfound("column '{$name}' is not defined");
+        if ($this->tryGetColumn($name) === null) {
+            throw new ColumnNotFound("column '{$name}' is not defined");
         }
         return $this->columns[$name];
+    }
+
+    /**
+     *
+     * @param string $name
+     * @param string $default
+     * @return \dooaki\Phroonga\Column
+     */
+    public function tryGetColumn($name, $default = null) {
+        return isset($this->columns[$name]) ? $this->columns[$name] : $default;
     }
 
     public function getColumns()
@@ -56,7 +72,12 @@ class Table
 
     public function createTable(DriverInterface $driver)
     {
-        $driver->tableCreate($this->name, $this->options);
+        $result = $driver->tableCreate($this->name, $this->options);
+        if ($result->isFailure()) {
+            $e = new CommandFailure($result->getErrorMessage());
+            $e->setResult($result);
+            throw $e;
+        }
     }
 
     public function createColumns(DriverInterface $driver)
@@ -68,7 +89,12 @@ class Table
 
     public function removeTable(DriverInterface $driver)
     {
-        $driver->tableRemove($this->name);
+        $result = $driver->tableRemove($this->name);
+        if ($result->isFailure()) {
+            $e = new CommandFailure($result->getErrorMessage());
+            $e->setResult($result);
+            throw $e;
+        }
     }
 
     public function removeColumns(DriverInterface $driver)
