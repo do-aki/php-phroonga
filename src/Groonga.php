@@ -44,7 +44,7 @@ class Groonga
     public function activate(array $classes = null)
     {
         $entity_trait_name = GroongaEntity::class;
-        if ($classes === null && trait_exists($entity_trait_name, false)) {
+        if ($classes === null) {
             $classes = [];
             foreach (get_declared_classes() as $cls) {
                 if (in_array($entity_trait_name, class_uses($cls, false))) {

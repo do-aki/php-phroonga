@@ -1,7 +1,7 @@
 <?php
 namespace dooaki\Phroonga;
 
-use dooaki\Phroonga\Exception\TableNotfound;
+use dooaki\Phroonga\Exception\TableNotFound;
 
 class SchemaMapping
 {
