@@ -3,21 +3,32 @@ namespace dooaki\Phroonga;
 
 use dooaki\Phroonga\Exception\DriverNotFound;
 use dooaki\Phroonga\Exception\InvalidEntity;
+use dooaki\Phroonga\Exception\InvalidArgument;
+use dooaki\Phroonga\Driver\Http;
 
 class Groonga
 {
     private $driver;
 
+    private $connected = false;
+
     private $entities = [];
 
-    public function __construct($host, $port, $options = [])
-    {
-        $options += [
-            'driver' => Driver\Http::class
-        ];
-        $this->setDriver($options['driver']);
+    private $default_drivers = [
+        'http' => 'dooaki\Phroonga\Driver\Http',
+        'mock' => 'dooaki\Phroonga\Driver\Mock',
+    ];
 
-        $this->driver->connect($host, $port);
+    public function __construct($dsn_or_driver, $options = [])
+    {
+        if (is_string($dsn_or_driver)) {
+            $driver = $this->createDriverFromDsn($dsn_or_driver, $options);
+        } elseif ($dsn_or_driver instanceof DriverInterface) {
+            $driver = $dsn_or_driver;
+            $driver->setOptions($options);
+        }
+
+        $this->setDriver($driver);
     }
 
     public function getDriver()
@@ -25,21 +36,9 @@ class Groonga
         return $this->driver;
     }
 
-    public function setDriver($driver)
+    public function setDriver(DriverInterface $driver)
     {
-        if ($driver instanceof DriverInterface) {
-            $this->driver = $driver;
-        } elseif (is_string($driver)) {
-            if (class_exists($driver) && is_a($driver, DriverInterface::class, true)) {
-                $this->driver = new $driver();
-            } else {
-                throw new DriverNotFound("{$driver} is not DriverInterface");
-            }
-        }
-
-        if (!$this->driver) {
-            throw new DriverNotFound();
-        }
+        $this->driver = $driver;
     }
 
     public function activate(array $classes = null)
@@ -53,6 +52,8 @@ class Groonga
                 }
             }
         }
+
+        $this->driver->connect();
 
         foreach ($classes as $cls) {
             $this->activateClass($cls);
@@ -115,7 +116,7 @@ class Groonga
     {
         return $this->driver->tableList()->map(
             function (ResultEntity $r) {
-                return $r;
+                return $r->name;
             }
         )->toArray();
     }
@@ -133,7 +134,7 @@ class Groonga
         $target = array_filter(
             $target,
             function ($td) use($tables) {
-                return ! in_array($td->getName(), $tables);
+                return !in_array($td->getName(), $tables);
             }
         );
 
@@ -154,6 +155,7 @@ class Groonga
 
         $cls = get_class($entity);
 
+        // TODO: 直接 load を呼ばずに、変更をバッファリンクする機構が欲しい
         return $this->driver->load(SchemaMapping::getTable($cls)->getName(), $entity->toJsonForLoad());
     }
 
@@ -177,5 +179,34 @@ class Groonga
         }
 
         return substr($cls, $pos + 1);
+    }
+
+    public static function parseDsn($dsn) {
+        if (preg_match('#\A([^:]*)://([^/:]*)(:([^/]*))?(/.*)?\z#', $dsn, $m)) {
+            $m += array_fill(0, 6, '');
+            return [
+                'protocol' => $m[1],
+                'host' => $m[2],
+                'port' => $m[4],
+                'path' => $m[5],
+            ];
+        }
+    }
+
+    public function createDriverFromDsn($dsn, array $options) {
+
+        $spec = self::parseDsn($dsn);
+        if (!$spec) {
+            throw new InvalidArgument("invalid DSN '{$dns}'");
+        }
+
+        if (!isset($this->default_drivers[$spec['protocol']])) {
+            throw new DriverNotFound("undefined protocol: {$spec['protocol']}");
+        }
+
+        $cls = $this->default_drivers[$spec['protocol']];
+        $driver = new $cls();
+        $driver->setOptions($options + $spec);
+        return $driver;
     }
 }

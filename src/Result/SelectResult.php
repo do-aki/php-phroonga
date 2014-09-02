@@ -112,7 +112,7 @@ class SelectResult extends GroongaResult
 
     public function eachSearchResult(callable $callback = null)
     {
-        $this->result_type = self::RESULT_TYPE_DRILLDOWN;
+        $this->result_type = self::RESULT_TYPE_SEARCH;
 
         if ($callback !== null) {
             $this->apply($callback);
@@ -139,13 +139,14 @@ class SelectResult extends GroongaResult
         }
 
         $search_result = array_shift($body);
-        $self->found_count = array_shift($search_result);
+
+        $self->found_count = array_shift($search_result)[0];
         $self->columns = array_shift($search_result);
         $self->rows = $search_result;
 
         $drilldown_result = array_shift($body);
         if ($drilldown_result) {
-            $self->drilldown_count = array_shift($drilldown_result);
+            $self->drilldown_count = array_shift($drilldown_result)[0];
             $self->drilldown_columns = array_shift($drilldown_result);
             $self->drilldown_rows = $drilldown_result;
         }

@@ -1,5 +1,5 @@
 <?php
-namespace dooaki\Test\Phroonga;
+namespace dooaki\Test\Phroonga\Result;
 
 use dooaki\Phroonga\GroongaResult;
 use dooaki\Phroonga\Result\BooleanResult;

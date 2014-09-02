@@ -19,9 +19,23 @@ class Http implements DriverInterface
      */
     private $client;
 
-    public function connect($host, $port)
+    private $host;
+    private $port;
+
+    public function setOptions(array $options)
     {
-        $this->client = new Client("http://{$host}:{$port}");
+        $options += [
+            'host' => 'localhost',
+            'port' => 10043,
+        ];
+
+        $this->host = $options['host'];
+        $this->port = $options['port'];
+    }
+
+    public function connect()
+    {
+        $this->client = new Client("http://{$this->host}:{$this->port}");
     }
 
     public function status()

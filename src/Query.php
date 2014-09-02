@@ -2,6 +2,7 @@
 namespace dooaki\Phroonga;
 
 use dooaki\Phroonga\DriverInterface;
+use dooaki\Phroonga\SchemaMapping;
 
 class Query
 {
@@ -36,9 +37,14 @@ class Query
         $this->entity_class = $entity_class;
     }
 
+    public function getTableDefinition()
+    {
+        return SchemaMapping::getTable($this->entity_class);
+    }
+
     public function getTableName()
     {
-        return SchemaMapping::getTable($this->entity_class)->getName();
+        return $this->getTableDefinition()->getName();
     }
 
     public function filter()
@@ -95,6 +101,11 @@ class Query
         return $this;
     }
 
+    public function output_columns(array $columns) {
+        $this->output_columns = $columns;
+        return $this;
+    }
+
     public function drilldown(array $columns)
     {
         $this->drilldown = $columns;
@@ -127,38 +138,40 @@ class Query
 
     public function findOne($column)
     {
-        $this->output_columns = [
-            $column
-        ];
+        $this->output_columns([$column]);
         $row = $this->findFirst();
-        if (! $row) {
-            return null;
-        }
-        return $row->$column;
+        return $row ? $row->$column : null;
     }
 
     public function findFirst()
     {
-        $this->limit = 1;
+        $this->limit(1);
         $r = $this->driver->select($this->getTableName(), $this->build());
         $r->setEntityClass($this->entity_class);
+        return $r->first();
+    }
 
-        $ret = null;
-        foreach ($r->getRows() as $row) {
-            $ret = $row;
-            break;
-        }
-        return $ret;
+    public function find($key)
+    {
+        $key_name = $this->getTableDefinition()->getKeyName();
+        $this->query("{$key_name}:?", $key);
+        return $this->findFirst();
     }
 
     /**
      *
-     * XXX: groonga の default limit 分しか取得できない
+     * XXX: 件数多くても一度に全てフェッチしてしまう
      *
      * @return \dooaki\Phroonga\Result\SelectResult
      */
     public function findAll()
     {
+        if (!isset($this->limit)) {
+            $this->limit(0);
+            $r = $this->driver->select($this->getTableName(), $this->build());
+            $this->limit($r->getFoundCount());
+        }
+
         $r = $this->driver->select($this->getTableName(), $this->build());
         $r->setEntityClass($this->entity_class);
         return $r;

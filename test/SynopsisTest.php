@@ -2,29 +2,11 @@
 namespace dooaki\Test\Phroonga;
 
 use dooaki\Phroonga\Groonga;
-use dooaki\Phroonga\GroongaEntity;
 use dooaki\Phroonga\Table;
-
-class SynopsisTest_Entity
-{
-    use GroongaEntity;
-
-    public static function _schema()
-    {
-        self::Table(
-            'Synopsis',
-            [
-                'flags' => 'TABLE_HASH_KEY',
-                'key_type' => 'ShortText'
-            ]
-        );
-        self::Column('value', 'Int32');
-    }
-}
+use dooaki\Test\Phroonga\Model\Synopsis;
 
 class SynopsisTest extends \PHPUnit_Framework_TestCase
 {
-
     private $grn;
 
     public function setUp()
@@ -36,10 +18,10 @@ class SynopsisTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('no GROONGA_TEST_HOST');
         }
 
-        $this->grn = new Groonga($host, $port);
+        $this->grn = new Groonga("http://{$host}:{$port}");
         $this->grn->activate(
             [
-                SynopsisTest_Entity::class
+                Synopsis::class
             ]
         );
 
@@ -61,18 +43,19 @@ class SynopsisTest extends \PHPUnit_Framework_TestCase
 
     public function test_save_and_select()
     {
-        $e = new SynopsisTest_Entity();
+        $e = new Synopsis();
         $e->_key = "key";
         $e->value = 999;
         $e->save();
 
-        $r = SynopsisTest_Entity::select()->query('_key:?', 'key')->findFirst();
+        $r = Synopsis::select()->find('key');
+        //   Synopsis::select()->query('_key:?', 'key')->findFirst();
         $this->assertSame("key", $r->_key);
         $this->assertSame(999, $r->value);
     }
 
     public function test_fail()
     {
-        SynopsisTest_Entity::select()->query('invalid_column:?')->findFirst();
+        Synopsis::select()->query('invalid_column:?')->findFirst();
     }
 }

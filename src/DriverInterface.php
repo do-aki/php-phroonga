@@ -5,11 +5,15 @@ interface DriverInterface
 {
     /**
      *
-     * @param string $host
-     * @param integer $port
+     * @param array $options
+     */
+    public function setOptions(array $options);
+
+    /**
+     *
      * @return void
      */
-    public function connect($host, $port);
+    public function connect();
 
     /**
      *
