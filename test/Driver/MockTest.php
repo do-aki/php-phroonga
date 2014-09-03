@@ -7,13 +7,14 @@ use dooaki\Phroonga\Result\HashResult;
 use dooaki\Phroonga\Result\ListResult;
 use dooaki\Phroonga\GroongaResult;
 use dooaki\Phroonga\Result\BooleanResult;
+use dooaki\Phroonga\Result\SelectResult;
 
 class MockTest extends \PHPUnit_Framework_TestCase
 {
     public function test_status_array()
     {
         $mock = new Mock();
-        $mock->pushState(
+        $mock->pushExpects(
             'status',
             [
                 [GroongaResult::GRN_SUCCESS,1,2],
@@ -30,7 +31,7 @@ class MockTest extends \PHPUnit_Framework_TestCase
     public function test_tableList_json()
     {
         $mock = new Mock();
-        $mock->pushState(
+        $mock->pushExpects(
             'tableList',
             json_encode([
                 [GroongaResult::GRN_SUCCESS,1,2],
@@ -61,11 +62,39 @@ class MockTest extends \PHPUnit_Framework_TestCase
         $mock = new Mock();
         $result = new BooleanResult();
         $result->setReturnCode(GroongaResult::GRN_SYNTAX_ERROR);
-        $mock->pushState('tableCreate', $result);
+        $mock->pushExpects('tableCreate', $result);
 
         $r = $mock->tableCreate('name', []);
         $this->assertInstanceOf(BooleanResult::class, $r);
         $this->assertSame(GroongaResult::GRN_SYNTAX_ERROR, $r->getReturnCode());
+    }
+
+    /**
+     * @expectedException \dooaki\Phroonga\Exception\DriverError
+     */
+    public function test_columnCreate_input_args()
+    {
+        $mock = new Mock();
+        $mock->pushExpects('columnCreate', new BooleanResult(), ['tbl', 'name', 'falgs', 'type']);
+
+        $r = $mock->columnCreate('tbl', 'name', 'falgs', 'type', ['orverargs']);
+        $this->assertInstanceOf(BooleanResult::class, $r);
+    }
+
+    public function test_select_input_callable()
+    {
+        $mock = new Mock();
+        $called = false;
+        $mock->pushExpects('select', new SelectResult(), function ($table, $options) use(&$called) {
+            $this->assertSame('tbl', $table);
+            $this->assertSame(['query' => 'xxx'], $options);
+            $called = true;
+        });
+
+        $r = $mock->select('tbl', ['query' => 'xxx']);
+        $this->assertInstanceOf(SelectResult::class, $r);
+
+        $this->assertTrue($called);
     }
 
     /**
