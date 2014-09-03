@@ -10,6 +10,10 @@ namespace
 -------------
 dooaki\Phroonga
 
+requirements
+-------------
+php 5.5.0 or latter
+
 installation
 -------------
 
