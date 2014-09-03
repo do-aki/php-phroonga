@@ -47,8 +47,9 @@ class Query
         return $this->getTableDefinition()->getName();
     }
 
-    public function filter()
+    public function filter($filter)
     {
+        $this->filter = $filter;
         return $this;
     }
 
@@ -172,13 +173,6 @@ class Query
             $this->limit($r->getFoundCount());
         }
 
-        $r = $this->driver->select($this->getTableName(), $this->build());
-        $r->setEntityClass($this->entity_class);
-        return $r;
-    }
-
-    public function pagerize()
-    {
         $r = $this->driver->select($this->getTableName(), $this->build());
         $r->setEntityClass($this->entity_class);
         return $r;
