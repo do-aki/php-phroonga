@@ -56,7 +56,8 @@ class Query
     public function match(array $columns, $word)
     {
         $this->match_columns = $columns;
-        $this->query = $this->escape($word);
+        $this->query = $word;
+        return $this;
     }
 
     public function query($expr)
